@@ -123,6 +123,8 @@ import { BackendRequestService, RequestService, REQUEST_SERVICE_PATH } from '@th
 import { bindFrontendStopwatch, bindBackendStopwatch } from './performance';
 import { SaveResourceService } from './save-resource-service';
 import { UserWorkingDirectoryProvider } from './user-working-directory-provider';
+import { WindowTitleService } from './window/window-title-service';
+import { WindowTitleUpdater } from './window/window-title-updater';
 import { TheiaDockPanel } from './shell/theia-dock-panel';
 import { bindStatusBar } from './status-bar';
 import { MarkdownRenderer, MarkdownRendererFactory, MarkdownRendererImpl } from './markdown-rendering/markdown-renderer';
@@ -392,6 +394,9 @@ export const frontendApplicationModule = new ContainerModule((bind, _unbind, _is
     for (const contribution of [CommandContribution, KeybindingContribution, MenuContribution]) {
         bind(contribution).toService(WindowContribution);
     }
+    bind(WindowTitleService).toSelf().inSingletonScope();
+    bind(WindowTitleUpdater).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(WindowTitleUpdater);
     bindContributionProvider(bind, BreadcrumbsContribution);
     bind(BreadcrumbsService).toSelf().inSingletonScope();
     bind(BreadcrumbsRenderer).toSelf();
