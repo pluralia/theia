@@ -402,9 +402,18 @@ export class TerminalWidgetImpl extends TerminalWidget implements StatefulWidget
         throw new Error('Failed to start terminal' + (id ? ` for id: ${id}.` : '.'));
     }
 
+    async validateCWD(terminalId: number): Promise<boolean> {
+        if (!this.options.cwd) {
+            return true;
+        }
+        const expectedCWD = this.options.cwd.toString();
+        const terminalCWD = await this.shellTerminalServer.getCwdURI(terminalId);
+        return expectedCWD === terminalCWD;
+    }
+
     protected async attachTerminal(id: number): Promise<number> {
         const terminalId = await this.shellTerminalServer.attach(id);
-        if (IBaseTerminalServer.validateId(terminalId)) {
+        if (IBaseTerminalServer.validateId(terminalId) && await this.validateCWD(terminalId)) {
             return terminalId;
         }
         this.logger.warn(`Failed attaching to terminal id ${id}, the terminal is most likely gone. Starting up a new terminal instead.`);
