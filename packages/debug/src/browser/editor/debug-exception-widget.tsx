@@ -22,6 +22,7 @@ import { Disposable, DisposableCollection } from '@theia/core/lib/common/disposa
 import { MonacoEditorZoneWidget } from '@theia/monaco/lib/browser/monaco-editor-zone-widget';
 import { DebugEditor } from './debug-editor';
 import { DebugExceptionInfo } from '../model/debug-thread';
+import { nls } from '@theia/core/lib/common/nls';
 
 export interface ShowDebugExceptionParams {
     info: DebugExceptionInfo
@@ -89,8 +90,14 @@ export class DebugExceptionWidget implements Disposable {
 
     protected render(info: DebugExceptionInfo, cb: () => void): void {
         const stackTrace = info.details && info.details.stackTrace;
+        const exceptionTitle = info.id ?
+            nls.localizeByDefault('Exception has occurred: {0}', info.id) :
+            nls.localizeByDefault('Exception has occurred.');
         ReactDOM.render(<React.Fragment>
-            <div className='title'>{info.id ? `Exception has occurred: ${info.id}` : 'Exception has occurred.'}</div>
+            <div className='title'>
+                {exceptionTitle}
+                <span id="exception-close" className='action-label codicon codicon-close' onClick={() => this.hide()} title={nls.localizeByDefault('Close')}></span>
+            </div>
             {info.description && <div className='description'>{info.description}</div>}
             {stackTrace && <div className='stack-trace'>{stackTrace}</div>}
         </React.Fragment>, this.zone.containerNode, cb);
